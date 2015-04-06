@@ -2,3 +2,6 @@ Todo List
 ===========
 > Make it so that the key-up listener only
 reacts to the key that was pressed down.
+> Make it so ball excludes 90 degrees and 270 degrees
+> Fix top and bottom collision
+> Score system

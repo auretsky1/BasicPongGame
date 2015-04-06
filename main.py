@@ -1,34 +1,33 @@
 import pygame
 import Game_Handler
 
-
-#Constants
+# Constants
 screen_size = (600, 600)
 screen_flags = 0
 screen_depth = 0
 
-#Color constants
+# Color constants
 screen_clear_color = (0, 0, 0)
 
-#Variables
+# Variables
 is_game_running = True
 
-#Initialize pygame
+# Initialize PyGame
 pygame.init()
 
-#Setup the program window
+# Setup the program window
 pygame.display.set_caption("Pong Game")
 
-#Initialize the screen
+# Initialize the screen
 game_screen = pygame.display.set_mode(screen_size, screen_flags, screen_depth)
 game_handler = Game_Handler.Game_Handler(game_screen)
 
-#Create the game clock
+# Create the game clock
 game_clock = pygame.time.Clock()
 
-#Main game loop
+# Main game loop
 while is_game_running:
-    #Process events
+    # Process events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             is_game_running = False
@@ -45,17 +44,17 @@ while is_game_running:
             if event.key == pygame.K_DOWN:
                 game_handler.process_event(event)
 
-    #Do game logic
+    # Do game logic
     game_handler.game_logic()
 
-    #Clear the screen
+    # Clear the screen
     game_screen.fill(screen_clear_color)
 
-    #Draw game objects
+    # Draw game objects
     game_handler.draw_game_objects()
 
-    #Draw the screen
+    # Draw the screen
     pygame.display.flip()
 
-    #Frame-rate
+    # Frame-rate
     game_clock.tick(60)

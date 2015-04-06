@@ -1,5 +1,3 @@
-import pygame
-
 class Game_Object(object):
     #Constructor
     def __init__(self, game_screen, x_position=0, y_position=0,

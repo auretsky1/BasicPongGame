@@ -25,3 +25,13 @@ class Paddle(Game_Object.Game_Object):
                                                          self.y_position,
                                                          self.x_size,
                                                          self.y_size])
+
+    #Player wants to move up
+    def move_up(self):
+        y_change = (-((self.game_screen.get_height()/2)/60))
+        self.change_y_vel(y_change)
+
+    #Player wants to move down
+    def move_down(self):
+        y_change = ((self.game_screen.get_height()/2)/60)
+        self.change_y_vel(y_change)

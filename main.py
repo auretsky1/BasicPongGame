@@ -1,10 +1,12 @@
 import pygame
 import Game_Handler
 
+
 #Constants
 screen_size = (600, 600)
 screen_flags = 0
 screen_depth = 0
+
 
 #Color constants
 screen_clear_color = (0, 0, 0)
@@ -30,7 +32,10 @@ while is_game_running:
     #Process events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-          is_game_running = False
+            is_game_running = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                game_handler.process_event(event)
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
                 game_handler.process_event(event)
@@ -50,6 +55,7 @@ while is_game_running:
 
     #Draw game objects
     game_handler.draw_game_objects()
+
 
     #Draw the screen
     pygame.display.flip()

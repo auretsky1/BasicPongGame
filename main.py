@@ -2,7 +2,7 @@ import pygame
 import Game_Handler
 
 # Constants
-screen_size = (600, 600)
+screen_size = (500, 500)
 screen_flags = 0
 screen_depth = 0
 

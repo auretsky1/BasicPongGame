@@ -16,9 +16,14 @@ class Ball(Game_Object.Game_Object):
         # The following variables hold the x/y position during a collision detection
         self.x_col_point = 0
         self.y_col_point = 0
+        self.paddle_x_col_point = 0
+        self.paddle_y_col_point = 0
 
         # An initial speed variable that is used for resetting the speed when the ball is reset
         self.initial_speed = speed
+
+        # Flag to be used for collision checking special cases
+        self.special_collision = False
 
     # Update the ball object
     def game_object_update(self, paddle_one, paddle_two, game_score, ai_game_score):
@@ -51,14 +56,35 @@ class Ball(Game_Object.Game_Object):
                 # Before retracting upon the velocity set the collision point
                 self.x_col_point = self.x_position
                 self.y_col_point = self.y_position
+                self.paddle_x_col_point = paddle.x_position
+                self.paddle_y_col_point = paddle.y_position
 
                 # Perform regular collision handling if intersection occurred and paddle didn't move into ball
                 while has_collided:
                     self.x_position -= self.x_vel
                     self.y_position -= self.y_vel
+                    if paddle.y_vel != 0:
+                        paddle.x_position -= paddle.x_vel
+                        paddle.y_position -= paddle.y_vel
                     has_collided = self.ball_paddle_intersect_check(paddle)
-                # Now check which side of the paddle the ball is on and handle accordingly
-                self.ball_paddle_collision_handler(paddle)
+
+                # Create a flag that determines if the ball is above/below the paddle
+                if not (self.y_position > paddle.y_position and (self.y_position + self.y_size) < paddle.y_position + paddle.y_size):
+                    self.special_collision = True
+                if not ((self.y_vel < 0 and paddle.y_vel < 0) or (self.y_vel > 0 and paddle.y_vel > 0)):
+                    self.special_collision = False
+
+                # If special collision (paddle moving into ball) process accordingly
+                if self.special_collision:
+                    self.ball_paddle_collision_handler_moving(paddle)
+
+                # Else process normally
+                else:
+                    # Now check which side of the paddle the ball is on and handle accordingly
+                    self.ball_paddle_collision_handler(paddle)
+
+                # Either way set the flag back to false
+                self.special_collision = False
 
     # Handles velocity changes for various ball/paddle collisions
     def ball_paddle_collision_handler(self, current_paddle):
@@ -69,6 +95,32 @@ class Ball(Game_Object.Game_Object):
         # Check to see if ball is on the right of the paddle
         elif self.x_position >= (current_paddle.x_position + current_paddle.x_size):
             self.x_vel *= -1
+
+        # Check to see if ball is above the top of the paddle
+        if self.y_position <= current_paddle.y_position:
+            self.y_vel *= -1  # Paddle did not move into ball, process normally
+
+        # Check to see if ball is below the bottom of the paddle
+        elif self.y_position >= (current_paddle.y_position + current_paddle.y_size):
+            self.y_vel *= -1
+
+    # Handles velocity changes for various ball/paddle collisions
+    def ball_paddle_collision_handler_moving(self, current_paddle):
+        # Variable that will determine if there is currently a collision
+        has_collided = True
+
+        # Reverse the travel along the velocity line of the ball
+        while self.x_position != self.x_col_point:
+                    self.x_position += self.x_vel
+                    self.y_position += self.y_vel
+                    current_paddle.x_position += current_paddle.x_vel
+                    current_paddle.y_position += current_paddle.y_vel
+
+        # Travel along the velocity line of the ball until there is no collision
+        while has_collided:
+                    self.x_position += self.x_vel
+                    self.y_position += self.y_vel
+                    has_collided = self.ball_paddle_intersect_check(current_paddle)
 
         # Check to see if ball is above the top of the paddle
         if self.y_position <= current_paddle.y_position:
@@ -135,35 +187,6 @@ class Ball(Game_Object.Game_Object):
     def set_velocity(self, angle):
         self.y_vel = self.speed * math.sin(math.radians(angle))
         self.x_vel = self.speed * math.cos(math.radians(angle))
-
-    # Methods called outside the ball class to push it up for paddle-to-ball collision
-    def push_up(self, current_paddle):
-        self.y_position -= 1
-        while self.ball_paddle_intersect_check(current_paddle):
-            self.y_position -= 1
-            self.ball_paddle_intersect_check(current_paddle)
-
-        # The ball should have a new velocity that is slightly to the left/right of the paddle in question
-        if self.x_vel < 0:  # Ball is moving left and is struck
-            self.set_velocity(250)
-
-        # The ball should have a new velocity that is slightly to the left/right of the paddle in question
-        if self.x_vel > 0:  # Ball is moving left and is struck
-            self.set_velocity(290)
-
-    def push_down(self, current_paddle):
-        self.y_position += 1
-        while self.ball_paddle_intersect_check(current_paddle):
-            self.y_position += 1
-            self.ball_paddle_intersect_check(current_paddle)
-
-        # The ball should have a new velocity that is slightly to the left/right of the paddle in question
-        if self.x_vel < 0:  # Ball is moving left and is struck
-            self.set_velocity(110)
-
-        # The ball should have a new velocity that is slightly to the left/right of the paddle in question
-        if self.x_vel > 0:  # Ball is moving left and is struck
-            self.set_velocity(70)
 
     # Draw the ball object to the screen
     def game_object_draw(self):

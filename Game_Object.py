@@ -32,6 +32,7 @@ class Game_Object(object):
         self.y_vel = 0
         self.x_vel = 0
 
+
     # Take the absolute value of a velocity
     def abs_vel(self, x_or_y):
         if x_or_y == 0:

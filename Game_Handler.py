@@ -1,7 +1,7 @@
 import pygame
 import Paddle
 import Ball
-
+import Game_Text
 
 class Game_Handler(object):
 
@@ -21,6 +21,9 @@ class Game_Handler(object):
                                              ((game_screen.get_height()/2)-25),
                                              0, 0, 0, 1)
 
+
+
+
         # Add the paddles to the list of game objects
         self.game_objects.append(self.game_paddle_one)
         self.game_objects.append(self.game_paddle_two)
@@ -34,15 +37,20 @@ class Game_Handler(object):
         # Add the ball to the list of game objects
         self.game_objects.append(self.game_ball)
 
+        self.game_score = Game_Text.game_text(game_screen, 0, 0, 0, (game_screen.get_width()/2) - 80, 20, 0, 0, 0, 0)
+        self.ai_game_score = Game_Text.game_text(game_screen, 0, 0, 0, (game_screen.get_width()/2) + 80, 20, 0, 0, 0, 0)
+
         # Initialize game score
-        #self.game_Text = Game_Text.game_text(game_screen,
-        #self.game_objects.append(self.game_Text)
+        self.game_objects.append(self.game_score)
+        self.game_objects.append(self.ai_game_score)
 
     def game_logic(self):
         self.game_objects[0].game_object_update(self.game_ball)
         self.game_objects[1].game_object_update(self.game_ball)
         self.game_objects[1].game_ai_update(self.game_screen, self.game_ball)
-        self.game_objects[2].game_object_update(self.game_paddle_one, self.game_paddle_two)
+        self.game_objects[2].game_object_update(self.game_paddle_one, self.game_paddle_two, self.game_score, self.ai_game_score)
+        self.game_objects[3].game_object_update()
+        self.game_objects[4].game_object_update()
 
 
     def draw_game_objects(self):

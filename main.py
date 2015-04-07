@@ -14,6 +14,9 @@ is_game_running = True
 
 # Initialize PyGame
 pygame.init()
+pygame.font.init()
+
+
 
 # Setup the program window
 pygame.display.set_caption("Pong Game")

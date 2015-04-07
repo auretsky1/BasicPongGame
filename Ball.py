@@ -2,7 +2,7 @@ import pygame
 import random
 import math
 import Game_Object
-
+import Game_Text
 
 class Ball(Game_Object.Game_Object):
 
@@ -21,7 +21,7 @@ class Ball(Game_Object.Game_Object):
         self.initial_speed = speed
 
     # Update the ball object
-    def game_object_update(self, paddle_one, paddle_two):
+    def game_object_update(self, paddle_one, paddle_two, game_score, ai_game_score):
         # Adjust the position of the ball by the x_vel & y_vel
         self.y_position += self.y_vel
         self.x_position += self.x_vel
@@ -32,9 +32,15 @@ class Ball(Game_Object.Game_Object):
             self.y_vel *= -1
 
         # Check to make sure the ball hasn't collided with the
-        # left or right side of the screen, and if it did reset it's position.
-        if self.x_position + self.x_size >= self.game_screen.get_width() or self.x_position <= 0:
+        # left or right side of the screen, and if it did reset it's position. Updates game score
+        if self.x_position + self.x_size >= self.game_screen.get_width():
             self.reset_ball()
+            Game_Text.game_text.change_score(game_score)
+
+        if self.x_position <= 0:
+            self.reset_ball()
+            Game_Text.game_text.change_score(ai_game_score)
+
 
         for paddle in (paddle_one, paddle_two):
             # Check for collision with paddle

@@ -4,12 +4,24 @@ import Game_Object
 
 class Paddle(Game_Object.Game_Object):
 
+    # Constructor
     def __init__(self, game_screen, x_size, y_size, *args):
         Game_Object.Game_Object.__init__(self, game_screen, *args)
         self.x_size = x_size
         self.y_size = y_size
 
+        # Freeze-count: a number of frames to pause after player moves into ball
+        self.freeze_count = 0
+
+        # Constants
+        self.player_speed = ((self.game_screen.get_height()/2)/60)
+
+    # Update the current paddle object
     def game_object_update(self, current_ball):
+        if self.freeze_count > 0:
+            self.freeze_count -= 1
+            return
+
         # Adjust the y_position of the paddle by the y_vel
         self.y_position += self.y_vel
 
@@ -24,14 +36,9 @@ class Paddle(Game_Object.Game_Object):
         # Check to see if the paddle is moving, and if so if it's moved into the ball
         if self.y_vel != 0:
             if self.paddle_ball_intersect_check(current_ball):
-                if self.y_vel > 0:
-                    current_ball.push_down(self)
-                    current_ball.neg_abs_vel(1)
+                self.freeze_count = 4
 
-                if self.y_vel < 0:
-                    current_ball.push_up(self)
-                    current_ball.abs_vel(1)
-
+    # Draw the paddle object to the screen
     def game_object_draw(self):
         pygame.draw.rect(self.game_screen, (255, 0, 0), [self.x_position,
                                                          self.y_position,
@@ -74,26 +81,37 @@ class Paddle(Game_Object.Game_Object):
 
     # Player wants to move up
     def move_up(self):
-        y_change = (-((self.game_screen.get_height()/2)/60))
+        y_change = -self.player_speed
         self.change_y_vel(y_change)
 
     # Player wants to move down
     def move_down(self):
-        y_change = ((self.game_screen.get_height()/2)/60)
+        y_change = self.player_speed
         self.change_y_vel(y_change)
 
+    # Process paddle AI
     def game_ai_update(self, game_screen, ball):
+        # Constants for easier access
+        paddle_center = self.y_position + (self.y_size / 2)
+        ball_center = ball.y_position + (ball.y_size / 2)
+        y_distance = paddle_center - ball_center
 
         if ball.y_vel != 0:
-            if self.y_position + (self.y_size / 2) > ball.y_position + ball.y_size and not ball.y_position + ball.y_size  >= self.y_position:
-                self.y_vel = -(self.game_screen.get_height()/2/60)
+            if paddle_center > ball_center:
+                if abs(y_distance) < (self.y_size * 0.25):
+                    self.y_vel = 0
+                else:
+                    self.y_vel = -self.player_speed / 3
 
-            if self.y_position + (self.y_size / 2) < ball.y_position and not ball.y_position + (ball.y_size / 2) <= self.y_position + self.y_size:
-                self.y_vel =  self.game_screen.get_height()/2/60
+            elif paddle_center < ball_center:
+                if abs(y_distance) < (self.y_size * 0.25):
+                    self.y_vel = 0
+                else:
+                    self.y_vel = self.player_speed / 3
 
         if ball.y_vel == 0:
             self.y_vel = 0
-            self.x_position = game_screen.get_width()-40
-            self.y_position = (game_screen.get_height()/2)-25
+            #self.x_position = game_screen.get_width()-40
+            #self.y_position = (game_screen.get_height()/2)-25
 
 

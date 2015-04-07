@@ -81,3 +81,19 @@ class Paddle(Game_Object.Game_Object):
     def move_down(self):
         y_change = ((self.game_screen.get_height()/2)/60)
         self.change_y_vel(y_change)
+
+    def game_ai_update(self, game_screen, ball):
+
+        if ball.y_vel != 0:
+            if self.y_position + (self.y_size / 2) > ball.y_position + ball.y_size and not ball.y_position + ball.y_size  >= self.y_position:
+                self.y_vel = -(self.game_screen.get_height()/2/60)
+
+            if self.y_position + (self.y_size / 2) < ball.y_position and not ball.y_position + (ball.y_size / 2) <= self.y_position + self.y_size:
+                self.y_vel =  self.game_screen.get_height()/2/60
+
+        if ball.y_vel == 0:
+            self.y_vel = 0
+            self.x_position = game_screen.get_width()-40
+            self.y_position = (game_screen.get_height()/2)-25
+
+

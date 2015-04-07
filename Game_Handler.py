@@ -12,11 +12,11 @@ class Game_Handler(object):
         self.game_writing = []
 
         # Initialize game paddles
-        self.game_paddle_one = Paddle.Paddle(game_screen,50, 90, 20,
+        self.game_paddle_one = Paddle.Paddle(game_screen, 60, 90, 20,
                                             ((game_screen.get_height()/2)-25),
                                             0, 0, 0, 1)
 
-        self.game_paddle_two = Paddle.Paddle(game_screen, 10, game_screen.get_height(),
+        self.game_paddle_two = Paddle.Paddle(game_screen, 10, 60,
                                              game_screen.get_width()-40,
                                              ((game_screen.get_height()/2)-25),
                                              0, 0, 0, 1)
@@ -41,7 +41,9 @@ class Game_Handler(object):
     def game_logic(self):
         self.game_objects[0].game_object_update(self.game_ball)
         self.game_objects[1].game_object_update(self.game_ball)
+        self.game_objects[1].game_ai_update(self.game_screen, self.game_ball)
         self.game_objects[2].game_object_update(self.game_paddle_one, self.game_paddle_two)
+
 
     def draw_game_objects(self):
         for game_object in self.game_objects:

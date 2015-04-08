@@ -94,36 +94,23 @@ class Ball(Game_Object.Game_Object):
 
     # Handles velocity changes for various ball/paddle collisions
     def ball_paddle_collision_handler(self, current_paddle):
-        # Variables that hold the changes in velocity as a percent based on where the player hit the paddle
-        half_paddle_size = current_paddle.y_size / 2  # This holds half the size of the paddle
-        paddle_center_location = (current_paddle.y_position + (current_paddle.y_size / 2))  # Where the center of the paddle is
-        ball_center_location = (self.y_position + (self.y_size / 2)) # Where the center of the ball is
-        center_y_distance = abs(paddle_center_location - ball_center_location) # The distance from the center of the ball to paddle
-        velocity_change_ratio = (center_y_distance / half_paddle_size) # The ratio of distance to center and size of the paddle
-
         # Check to see if ball is on the left of the paddle
         if self.x_position <= current_paddle.x_position:
-            self.speed += abs(velocity_change_ratio * current_paddle.y_vel * 0.2)  # Increase speed in portion to paddle
-            self.direction_angle = self.calculate_reflection_angle(0, self.get_current_angle())
-            self.set_velocity(self.direction_angle)
+            self.speed += abs(current_paddle.y_vel * 0.2)  # Increase speed in portion to paddle
+            self.set_velocity(math.radians(self.set_return_angle(1, current_paddle)))
 
         # Check to see if ball is on the right of the paddle
         elif self.x_position >= (current_paddle.x_position + current_paddle.x_size):
-            self.speed += abs(velocity_change_ratio * current_paddle.y_vel * 0.2)  # Increase speed in portion to paddle
-            self.direction_angle = self.calculate_reflection_angle(0, self.get_current_angle())
-            self.set_velocity(self.direction_angle)
+            self.speed += abs(current_paddle.y_vel * 0.05)  # Increase speed in portion to paddle
+            self.set_velocity(math.radians(self.set_return_angle(0, current_paddle)))
 
         # Check to see if ball is above the top of the paddle
         if self.y_position <= current_paddle.y_position:
-            #self.speed += abs(velocity_change_ratio * current_paddle.y_vel * 0.02)  # Increase speed in portion to paddle
-            self.direction_angle = self.calculate_reflection_angle(1, self.get_current_angle())
-            self.set_velocity(self.direction_angle)
+            self.y_vel *= -1
 
         # Check to see if ball is below the bottom of the paddle
         elif self.y_position >= (current_paddle.y_position + current_paddle.y_size):
-            #self.speed += abs(velocity_change_ratio * current_paddle.y_vel * 0.02)  # Increase speed in portion to paddle
-            self.direction_angle = self.calculate_reflection_angle(1, self.get_current_angle())
-            self.set_velocity(self.direction_angle)
+            self.y_vel *= -1
 
     # Handles velocity changes for various ball/paddle collisions
     def ball_paddle_collision_handler_moving(self, current_paddle):
@@ -215,72 +202,36 @@ class Ball(Game_Object.Game_Object):
         self.y_vel = self.speed * math.sin(angle)
         self.x_vel = self.speed * math.cos(angle)
 
-    # Calculate the angle of reflection when the ball hits the paddle
-    def calculate_reflection_angle(self, side_or_tb, current_angle):
-        # Set the current_angle to be in degrees
-        current_angle = math.degrees(current_angle)
+    # Method that sets the return angle after hitting a paddle
+    def set_return_angle(self, right_or_left, current_paddle):
+        # Variables that hold the changes in velocity as a percent based on where the player hit the paddle
+        half_paddle_size = current_paddle.y_size / 2
+        paddle_center_location = (current_paddle.y_position + (current_paddle.y_size / 2))  # Where the center of the paddle is
+        ball_center_location = (self.y_position + (self.y_size / 2))  # Where the center of the ball is
+        center_y_distance = abs(paddle_center_location - ball_center_location) # The distance from the center of the ball to paddle
+        ratio = center_y_distance / half_paddle_size
 
-        # Peform reflection angle calculation based off of where the paddle was struck
-        if side_or_tb == 0:  # The left/right side was hit
-            # Angle in quadrant 2 or 4 (quadrant 1 or 3 of math modules unit circle)
-            if (current_angle > 0 and current_angle < 90) or (current_angle > 180 and current_angle < 270):
-                new_angle_in_degrees = current_angle + (180 - (((current_angle % 180) % 90) * 2))
-            # Angle in quadrant 1 or 3 (quadrant 2 or 4 of math modules unit circle)
-            elif (current_angle > 90 and current_angle < 180) or (current_angle > 270 and current_angle < 360):
-                new_angle_in_degrees = current_angle - (180 - (((current_angle % 180) % 90) * 2))
-        elif side_or_tb == 1:  # The top/bottom was hit
-            # Angle in quadrant 2 or 4 (quadrant 1 or 3 of math modules unit circle)
-            if (current_angle > 0 and current_angle < 90) or (current_angle > 180 and current_angle < 270):
-                new_angle_in_degrees = current_angle - (180 - (((current_angle % 180) % 90) * 2))
-            # Angle in quadrant 1 or 3 (quadrant 2 or 4 of math modules unit circle)
-            elif (current_angle > 90 and current_angle < 180) or (current_angle > 270 and current_angle < 360):
-                new_angle_in_degrees = current_angle + (180 - (((current_angle % 180) % 90) * 2))
+        if right_or_left == 0:  # Hit the right paddle
+            if ball_center_location < paddle_center_location:  # Ball is above the center of the paddle
+                self.speed += abs(ratio * current_paddle.y_vel * 0.02)  # Add some speed to ball
+                return (-70 * ratio) + 360
+            elif ball_center_location > paddle_center_location:  # Ball is below the center of the paddle
+                self.speed += abs(ratio * current_paddle.y_vel * 0.02)  # Add some speed to ball
+                return 70 * ratio
+            elif ball_center_location == paddle_center_location: # Ball hit exact center
+                self.speed += abs(ratio * current_paddle.y_vel * 0.02)  # Add some speed to ball
+                return 0
 
-        # Return the reflection angle in degrees
-        return math.radians(new_angle_in_degrees)
-
-    # Change the current angle based off of the point at which the ball collides with the paddle
-    def calculate_english_angle(self, current_angle, change_ratio):
-        # Set the current_angle to be in degrees
-        current_angle = math.degrees(current_angle)
-
-        # Calculate the inverse of the current angle
-        current_angle = (current_angle - 180)
-        if current_angle < 0:
-            current_angle += 360  # If the degrees are negative, add 360 degrees to get positive value
-        if current_angle > 360:
-            current_angle -= 360  # If the degrees are above 360, subtract 360 degrees to get positive value
-
-        # The angle as it should be passed in to self.calculate_reflect
-        angle_change = (2 * ((current_angle % 180) % 90))
-
-        # Perform reflection angle calculation based off of where the paddle was struck
-        # Angle in quadrant 2 or 4 (quadrant 1 or 3 of math modules unit circle)
-        if (current_angle > 0 and current_angle < 90) or (current_angle > 180 and current_angle < 270):
-            # Calculate the angle_with_change for collisions in this quadrant
-            angle_with_change = (current_angle + angle_change)
-            if angle_with_change < 0:  # If the angle_change is less than 0 and 360 degrees to get positive value
-                angle_with_change += 360
-            if angle_with_change > 360:
-                angle_with_change -= 360  # If the degrees are above 360, subtract 360 degrees to get positive value
-
-            # Set the new angle based off the angle_with_change
-            new_angle_in_degrees = change_ratio * (angle_with_change)
-
-        # Angle in quadrant 1 or 3 (quadrant 2 or 4 of math modules unit circle)
-        elif (current_angle > 90 and current_angle < 180) or (current_angle > 270 and current_angle < 360):
-            # Calculate the angle_with_change for collisions in this quadrant
-            angle_with_change = (current_angle - angle_change)
-            if angle_with_change < 0:  # If the angle_change is less than 0 and 360 degrees to get positive value
-                angle_with_change += 360
-            if angle_with_change > 360:
-                angle_with_change -= 360  # If the degrees are above 360, subtract 360 degrees to get positive value
-
-            # Set the new angle based off the angle_with_change
-            new_angle_in_degrees = change_ratio * angle_with_change
-
-        # Return the reflection angle in degrees
-        return math.radians(new_angle_in_degrees)
+        elif right_or_left == 1:  # Hit the left paddle
+            if ball_center_location < paddle_center_location:  # Ball is above the center of the paddle
+                self.speed += abs(ratio * current_paddle.y_vel * 0.02)  # Add some speed to ball
+                return 70 * ratio + 180
+            if ball_center_location > paddle_center_location:  # Ball is below the center of the paddle
+                self.speed += abs(ratio * current_paddle.y_vel * 0.02)  # Add some speed to ball
+                return (-70 * ratio) + 180
+            elif ball_center_location == paddle_center_location: # Ball hit exact center
+                self.speed += abs(ratio * current_paddle.y_vel * 0.02)  # Add some speed to ball
+                return 180
 
     # Get the current angle of travel based off the x_vel and y_vel
     def get_current_angle(self):

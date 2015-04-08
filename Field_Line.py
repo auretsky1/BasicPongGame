@@ -11,17 +11,12 @@ class Field(Game_Object.Game_Object):
         self.y_size = y_size
 
         self.field_line_list = []
-        self.field_line_list_two = []
-        self.field_line_list.append(self.y_position)
 
-        while self.y_position in range(510):
-            self.y_position += 20
-            self.field_line_list_two.append(self.y_position)
-            self.y_position += 20
+        while self.y_position in range(game_screen.get_height()):
             self.field_line_list.append(self.y_position)
+            self.y_position += 40
 
     def game_object_update(self):
-
         pass
 
     def game_object_draw(self):
@@ -30,11 +25,6 @@ class Field(Game_Object.Game_Object):
                                                                  self.field_line_list[i],
                                                                  self.x_size,
                                                                  self.y_size])
-        for i in range (len(self.field_line_list_two)):
-            pygame.draw.rect(self.game_screen, (0, 0, 0), [self.x_position,
-                                                           self.field_line_list_two[i],
-                                                           self.x_size,
-                                                           self.y_size])
 
 
 

@@ -14,7 +14,7 @@ class Paddle(Game_Object.Game_Object):
         self.freeze_count = 0
 
         # Constants
-        self.player_speed = ((self.game_screen.get_height()/2)/60)
+        self.paddle_speed = ((self.game_screen.get_height()/2)/60)
 
     # Update the current paddle object
     def game_object_update(self, current_ball):
@@ -81,12 +81,12 @@ class Paddle(Game_Object.Game_Object):
 
     # Player wants to move up
     def move_up(self):
-        y_change = -self.player_speed
+        y_change = -self.paddle_speed
         self.change_y_vel(y_change)
 
     # Player wants to move down
     def move_down(self):
-        y_change = self.player_speed
+        y_change = self.paddle_speed
         self.change_y_vel(y_change)
 
     # Process paddle AI
@@ -101,13 +101,13 @@ class Paddle(Game_Object.Game_Object):
                 if abs(y_distance) < (self.y_size * 0.25):
                     self.y_vel = 0
                 else:
-                    self.y_vel = -self.player_speed / 3
+                    self.y_vel = -self.paddle_speed * 0.80
 
             elif paddle_center < ball_center:
                 if abs(y_distance) < (self.y_size * 0.25):
                     self.y_vel = 0
                 else:
-                    self.y_vel = self.player_speed / 3
+                    self.y_vel = self.paddle_speed * 0.80
 
         if ball.y_vel == 0:
             self.y_vel = 0

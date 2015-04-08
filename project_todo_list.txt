@@ -4,3 +4,7 @@ Todo List
 > Make it so ball excludes 90 degrees and 270 degrees
 > Score system
 > Move game_ai from game_handler to ball's game_update method
+> Add english
+
+> Note: Putting project on back-burner for awhile. If anyone stumbled upon this feel free to update or ask questions.
+

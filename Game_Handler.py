@@ -2,6 +2,7 @@ import pygame
 import Paddle
 import Ball
 import Game_Text
+import Field_Line
 
 class Game_Handler(object):
 
@@ -10,6 +11,13 @@ class Game_Handler(object):
         self.game_screen = game_screen
         self.game_objects = []
         self.game_writing = []
+
+        # initialize vertical field line
+        self.vertical_field_line = Field_Line.Field(game_screen, 2, 20,
+                                                    (game_screen.get_width()/2) - 1,
+                                                    0, 0, 0, 0, 1)
+        # add vertical field line to objects
+        self.game_objects.append(self.vertical_field_line)
 
         # Initialize game paddles
         self.game_paddle_one = Paddle.Paddle(game_screen, 10, 60, 20,
@@ -36,21 +44,24 @@ class Game_Handler(object):
 
         # Add the ball to the list of game objects
         self.game_objects.append(self.game_ball)
-
-        self.game_score = Game_Text.game_text(game_screen, 0, 0, 0, (game_screen.get_width()/2) - 80, 20, 0, 0, 0, 0)
-        self.ai_game_score = Game_Text.game_text(game_screen, 0, 0, 0, (game_screen.get_width()/2) + 80, 20, 0, 0, 0, 0)
-
         # Initialize game score
+        self.game_score = Game_Text.game_text(game_screen, 0, 0, 0, (game_screen.get_width()/2)- 80, 20, 0, 0, 0, 0)
+        self.ai_game_score = Game_Text.game_text(game_screen, 0, 0, 0, (game_screen.get_width()/2) + 61, 20, 0, 0, 0, 0)
+
+        # add game score to list of objects
         self.game_objects.append(self.game_score)
         self.game_objects.append(self.ai_game_score)
 
+
+
     def game_logic(self):
-        self.game_objects[0].game_object_update(self.game_ball)
         self.game_objects[1].game_object_update(self.game_ball)
-        self.game_objects[1].game_ai_update(self.game_screen, self.game_ball)
-        self.game_objects[2].game_object_update(self.game_paddle_one, self.game_paddle_two, self.game_score, self.ai_game_score)
-        self.game_objects[3].game_object_update()
+        self.game_objects[2].game_object_update(self.game_ball)
+        self.game_objects[2].game_ai_update(self.game_screen, self.game_ball)
+        self.game_objects[3].game_object_update(self.game_paddle_one, self.game_paddle_two, self.game_score, self.ai_game_score)
         self.game_objects[4].game_object_update()
+        self.game_objects[5].game_object_update()
+        self.game_objects[0].game_object_update()
 
     def draw_game_objects(self):
         for game_object in self.game_objects:
